@@ -171,6 +171,12 @@ class TetrisGame:
         self.current_piece_shape = None
         self.hold_piece_shape = None
 
+        self.hold_canvas = tk.Canvas(root, width=3 * CELL_SIZE, height=CELL_SIZE * 4)
+        self.hold_canvas.pack(side=tk.RIGHT)
+        self.next_canvas = tk.Canvas(root, width=3 * CELL_SIZE, height=CELL_SIZE * 5)
+        self.next_canvas.pack(side=tk.RIGHT)
+
+
         self.pop_next_piece()
         self.update()
 
@@ -359,7 +365,7 @@ class TetrisGame:
         self.canvas.delete("all")
 
         # 背景を黒に設定
-        self.canvas.create_rectangle(0, 0, GRID_WIDTH * CELL_SIZE, GRID_HEIGHT * CELL_SIZE, fill="black")
+        self.canvas.create_rectangle(0, 0, GRID_WIDTH * CELL_SIZE , GRID_HEIGHT * CELL_SIZE, fill="black")
 
         # 格子の描画
         for x in range(GRID_WIDTH):
@@ -381,19 +387,63 @@ class TetrisGame:
                 for x, cell in enumerate(row):
                     if cell:
                         self.draw_cell(self.current_piece_position[1] + x, self.current_piece_position[0] + y, "red")
+        # ホールドピースの描画
+        self.draw_hold_piece()
+    
+        # 次のピースの描画
+        self.draw_next_pieces()
 
     def draw_cell(self, x, y, color):
         """1マスを描画"""
         self.canvas.create_rectangle(
             x * CELL_SIZE, y * CELL_SIZE, (x + 1) * CELL_SIZE, (y + 1) * CELL_SIZE, fill=color, outline="gray"
         )
+
+    def draw_hold_piece(self):
+        self.hold_canvas.delete("all")
+        if self.hold_piece is not None:
+            for y, row in enumerate(self.hold_piece):
+                for x, cell in enumerate(row):
+                    if cell:
+                        self.draw_cell_in_canvas(self.hold_canvas, x, y, "green")
+
+    def draw_next_pieces(self):
+        self.next_canvas.delete("all")
+        for i in range(min(NUM_NEXT_PIECES, len(self.next_pieces))):
+            piece_shape = self.next_pieces[i]
+            piece = None
+            match piece_shape:
+                case "T":
+                    piece = T_mino[0]
+                case "I":
+                    piece = I_mino[0]
+                case "O":
+                    piece = O_mino[0]
+                case "Z":
+                    piece = Z_mino[0]
+                case "S":
+                    piece = S_mino[0]
+                case "J":
+                    piece = J_mino[0]
+                case "L":
+                    piece = L_mino[0]
+            for y, row in enumerate(piece):
+                for x, cell in enumerate(row):
+                    if cell:
+                        self.draw_cell_in_canvas(self.next_canvas, x, y + i * 2, "yellow")
+
+    def draw_cell_in_canvas(self, canvas, x, y, color):
+        canvas.create_rectangle(
+            x * CELL_SIZE, y * CELL_SIZE, (x + 1) * CELL_SIZE, (y + 1) * CELL_SIZE, fill=color, outline="gray"
+        )
+
     
     def update(self):
         """ゲームの更新処理"""
         #self.move_down()
         self.draw_board()
         self.root.after(16, self.update)
-        
+
 
 
 # メインプログラム
