@@ -393,6 +393,7 @@ class TetrisGame:
         #self.move_down()
         self.draw_board()
         self.root.after(16, self.update)
+        
 
 
 # メインプログラム
