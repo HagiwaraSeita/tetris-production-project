@@ -6,9 +6,10 @@ const CELL_SIZE = 30
 
 interface Props {
   gameState: GameState
+  aiHighlightCells?: [number, number][] | null
 }
 
-export const Board: React.FC<Props> = ({ gameState }) => {
+export const Board: React.FC<Props> = ({ gameState, aiHighlightCells }) => {
   const {
     board,
     current_piece,
@@ -16,6 +17,8 @@ export const Board: React.FC<Props> = ({ gameState }) => {
     current_piece_shape,
     ghost_position,
   } = gameState
+
+  const aiCellSet = new Set((aiHighlightCells ?? []).map(([r, c]) => `${r}-${c}`))
 
   type Cell = { shape: string | 0; isGhost: boolean }
   const display: Cell[][] = board.map(row =>
@@ -59,6 +62,7 @@ export const Board: React.FC<Props> = ({ gameState }) => {
     >
       {display.map((row, y) =>
         row.map(({ shape, isGhost }, x) => {
+          const isAICell = !shape && aiCellSet.has(`${y}-${x}`)
           const color = shape ? PIECE_COLORS[shape as string] : '#111'
           return (
             <div
@@ -66,9 +70,11 @@ export const Board: React.FC<Props> = ({ gameState }) => {
               style={{
                 width: CELL_SIZE,
                 height: CELL_SIZE,
-                backgroundColor: isGhost ? 'transparent' : color,
+                backgroundColor: isGhost || isAICell ? 'transparent' : color,
                 border: isGhost
                   ? `2px solid ${PIECE_COLORS[shape as string]}`
+                  : isAICell
+                  ? '2px solid #ff69b4'
                   : '1px solid #2a2a2a',
                 boxSizing: 'border-box',
               }}

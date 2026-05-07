@@ -1,27 +1,44 @@
 import { useState } from 'react'
+import { GameState } from '../hooks/useGame'
 
 interface Message {
   role: 'user' | 'ai'
   content: string
 }
 
-export const Chat = () => {
+interface Props {
+  gameState: GameState
+  onAIPlacement: (cells: [number, number][]) => void
+}
+
+export const Chat = ({ gameState, onAIPlacement }: Props) => {
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(false)
 
   const askAI = async () => {
-    const userMessage = 'こんにちは'
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }])
+    const userLabel = `${gameState.current_piece_shape}ミノの置き場所を分析`
+    setMessages(prev => [...prev, { role: 'user', content: userLabel }])
     setLoading(true)
 
     try {
       const res = await fetch('http://localhost:8000/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({
+          board: gameState.board,
+          current_piece_shape: gameState.current_piece_shape,
+          current_piece: gameState.current_piece,
+          current_piece_position: gameState.current_piece_position,
+          rot: gameState.rot,
+          next_pieces: gameState.next_pieces,
+          hold_piece_shape: gameState.hold_piece_shape,
+        }),
       })
       const data = await res.json()
       setMessages(prev => [...prev, { role: 'ai', content: data.reply }])
+      if (data.selected_cells?.length) {
+        onAIPlacement(data.selected_cells)
+      }
     } catch {
       setMessages(prev => [...prev, { role: 'ai', content: 'エラーが発生しました' }])
     } finally {
@@ -43,6 +60,11 @@ export const Chat = () => {
         flexDirection: 'column',
         gap: 8,
       }}>
+        {messages.length === 0 && (
+          <div style={{ color: '#333', fontSize: 11, marginTop: 8 }}>
+            「AIに聞く」を押すと現在の盤面を分析します
+          </div>
+        )}
         {messages.map((msg, i) => (
           <div
             key={i}

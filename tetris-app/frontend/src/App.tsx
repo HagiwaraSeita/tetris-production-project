@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react'
 import { useGame } from './hooks/useGame'
 import { Board } from './components/Board'
 import { Chat } from './components/Chat'
@@ -6,6 +7,17 @@ import { NextPieces } from './components/NextPieces'
 
 export default function App() {
   const { gameState } = useGame('ws://localhost:8000/ws')
+  const [aiHighlightCells, setAiHighlightCells] = useState<[number, number][] | null>(null)
+  // ミノが設置されたら（盤面の埋まりセル数が変化したら）ハイライトを消す
+  const prevFilledRef = useRef(0)
+  useEffect(() => {
+    if (!gameState) return
+    const filled = gameState.board.flat().filter(c => c !== 0).length
+    if (filled !== prevFilledRef.current) {
+      prevFilledRef.current = filled
+      setAiHighlightCells(null)
+    }
+  }, [gameState])
 
   if (!gameState) {
     return (
@@ -58,7 +70,7 @@ export default function App() {
 
       {/* Board */}
       <div style={{ position: 'relative' }}>
-        <Board gameState={gameState} />
+        <Board gameState={gameState} aiHighlightCells={aiHighlightCells} />
         {gameState.game_over && (
           <div
             style={{
@@ -87,7 +99,7 @@ export default function App() {
 
       {/* Chat panel */}
       <div style={{ paddingTop: 4 }}>
-        <Chat />
+        <Chat gameState={gameState} onAIPlacement={setAiHighlightCells} />
       </div>
     </div>
   )
