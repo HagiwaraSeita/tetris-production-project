@@ -50,6 +50,7 @@ export default function App() {
           <div>S ⇩ Hard drop</div>
           <div>J ↻ CW rotate</div>
           <div>L ↺ CCW rotate</div>
+          <div>I ↕ 180 rotate</div>
           <div>K ⊟ Hold</div>
         </div>
       </div>

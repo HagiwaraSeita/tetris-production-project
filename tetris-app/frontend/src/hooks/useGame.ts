@@ -21,11 +21,19 @@ const KEY_MAP: Record<string, string> = {
   k: 'hold',
   l: 'rotate_counterclockwise',
   j: 'rotate_clockwise',
+  i: 'rotate_180',
 }
+
+// 長押しリピートを有効にするアクション
+const DAS_ACTIONS = new Set(['move_left', 'move_right', 'move_down'])
+const DAS_FRAMES = 6  // 長押し開始までのフレーム数
 
 export function useGame(wsUrl: string) {
   const [gameState, setGameState] = useState<GameState | null>(null)
   const ws = useRef<WebSocket | null>(null)
+  // action -> 押し始めてからのフレーム数
+  const held = useRef<Map<string, number>>(new Map())
+  const rafRef = useRef<number>(0)
 
   useEffect(() => {
     const socket = new WebSocket(wsUrl)
@@ -40,16 +48,40 @@ export function useGame(wsUrl: string) {
     }
   }, [])
 
+  // DAS: 毎フレーム held を走査し、DAS_FRAMES 経過後は毎フレーム送信
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const tick = () => {
+      held.current.forEach((frames, action) => {
+        if (frames >= DAS_FRAMES) sendAction(action)
+        held.current.set(action, frames + 1)
+      })
+      rafRef.current = requestAnimationFrame(tick)
+    }
+    rafRef.current = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [sendAction])
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.repeat) return  // ブラウザ側のキーリピートは使わない
       const action = KEY_MAP[e.key]
-      if (action) {
-        e.preventDefault()
-        sendAction(action)
+      if (!action) return
+      e.preventDefault()
+      sendAction(action)  // 最初の押下は即時送信
+      if (DAS_ACTIONS.has(action)) {
+        held.current.set(action, 0)  // DAS カウント開始
       }
     }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    const onKeyUp = (e: KeyboardEvent) => {
+      const action = KEY_MAP[e.key]
+      if (action) held.current.delete(action)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('keyup', onKeyUp)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('keyup', onKeyUp)
+    }
   }, [sendAction])
 
   return { gameState, sendAction }

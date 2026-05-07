@@ -8,7 +8,8 @@ export const PIECE_COLORS: Record<string, string> = {
   L: '#e67e22',
 }
 
-// Each piece has 4 rotation states represented as 4x4 grids (mirrored from backend)
+// Each piece h
+// as 4 rotation states represented as 4x4 grids (mirrored from backend)
 export const MINOS: Record<string, number[][][]> = {
   T: [
     [[0,1,0,0],[1,1,1,0],[0,0,0,0],[0,0,0,0]],
