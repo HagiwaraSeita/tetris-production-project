@@ -7,155 +7,52 @@ GRID_HEIGHT = 20
 CELL_SIZE = 30
 NUM_NEXT_PIECES = 5
 
-# テトリスの形状
 PIECES = ['T', 'O', 'I', 'Z', 'S', 'J', 'L']
-T_mino = [
-    [[0, 1, 0, 0],
-    [1, 1, 1, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]],#0
 
-    [[0, 1, 0, 0],
-    [1, 1, 0, 0],
-    [0, 1, 0, 0],
-    [0, 0, 0, 0]],#90
-
-    [[0, 0, 0, 0],
-    [1, 1, 1, 0],
-    [0, 1, 0, 0],
-    [0, 0, 0, 0]],#180
-
-    [[0, 1, 0, 0],
-    [0, 1, 1, 0],
-    [0, 1, 0, 0],
-    [0, 0, 0, 0]]#270
-]
-O_mino = [
-    [[0, 1, 1, 0],
-    [0, 1, 1, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 1, 1, 0],
-    [0, 1, 1, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 1, 1, 0],
-    [0, 1, 1, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 1, 1, 0],
-    [0, 1, 1, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]]
-]
-I_mino = [
-    [[0, 0, 0, 0],
-    [1, 1, 1, 1],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 1, 0, 0],
-    [0, 1, 0, 0],
-    [0, 1, 0, 0],
-    [0, 1, 0, 0]],
-
-    [[0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [1, 1, 1, 1],
-    [0, 0, 0, 0]],
-
-    [[0, 0, 1, 0],
-    [0, 0, 1, 0],
-    [0, 0, 1, 0],
-    [0, 0, 1, 0]]
-]
-Z_mino = [
-    [[1, 1, 0, 0],
-    [0, 1, 1, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 1, 0, 0],
-    [1, 1, 0, 0],
-    [1, 0, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 0, 0, 0],
-    [1, 1, 0, 0],
-    [0, 1, 1, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 0, 1, 0],
-    [0, 1, 1, 0],
-    [0, 1, 0, 0],
-    [0, 0, 0, 0]]
-]
-S_mino = [
-    [[0, 1, 1, 0],
-    [1, 1, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[1, 0, 0, 0],
-    [1, 1, 0, 0],
-    [0, 1, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 0, 0, 0],
-    [0, 1, 1, 0],
-    [1, 1, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 1, 0, 0],
-    [0, 1, 1, 0],
-    [0, 0, 1, 0],
-    [0, 0, 0, 0]]
-]
-J_mino = [
-    [[1, 0, 0, 0],
-    [1, 1, 1, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 1, 0, 0],
-    [0, 1, 0, 0],
-    [1, 1, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 0, 0, 0],
-    [1, 1, 1, 0],
-    [0, 0, 1, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 1, 1, 0],
-    [0, 1, 0, 0],
-    [0, 1, 0, 0],
-    [0, 0, 0, 0]]
-]
-L_mino = [
-    [[0, 0, 1, 0],
-    [1, 1, 1, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[1, 1, 0, 0],
-    [0, 1, 0, 0],
-    [0, 1, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 0, 0, 0],
-    [1, 1, 1, 0],
-    [1, 0, 0, 0],
-    [0, 0, 0, 0]],
-
-    [[0, 1, 0, 0],
-    [0, 1, 0, 0],
-    [0, 1, 1, 0],
-    [0, 0, 0, 0]]
-]
+MINOS = {
+    "T": [
+        [[0,1,0,0],[1,1,1,0],[0,0,0,0],[0,0,0,0]],
+        [[0,1,0,0],[1,1,0,0],[0,1,0,0],[0,0,0,0]],
+        [[0,0,0,0],[1,1,1,0],[0,1,0,0],[0,0,0,0]],
+        [[0,1,0,0],[0,1,1,0],[0,1,0,0],[0,0,0,0]],
+    ],
+    "O": [
+        [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+        [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+        [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+        [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+    ],
+    "I": [
+        [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
+        [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]],
+        [[0,0,0,0],[0,0,0,0],[1,1,1,1],[0,0,0,0]],
+        [[0,0,1,0],[0,0,1,0],[0,0,1,0],[0,0,1,0]],
+    ],
+    "Z": [
+        [[1,1,0,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+        [[0,1,0,0],[1,1,0,0],[1,0,0,0],[0,0,0,0]],
+        [[0,0,0,0],[1,1,0,0],[0,1,1,0],[0,0,0,0]],
+        [[0,0,1,0],[0,1,1,0],[0,1,0,0],[0,0,0,0]],
+    ],
+    "S": [
+        [[0,1,1,0],[1,1,0,0],[0,0,0,0],[0,0,0,0]],
+        [[1,0,0,0],[1,1,0,0],[0,1,0,0],[0,0,0,0]],
+        [[0,0,0,0],[0,1,1,0],[1,1,0,0],[0,0,0,0]],
+        [[0,1,0,0],[0,1,1,0],[0,0,1,0],[0,0,0,0]],
+    ],
+    "J": [
+        [[1,0,0,0],[1,1,1,0],[0,0,0,0],[0,0,0,0]],
+        [[0,1,0,0],[0,1,0,0],[1,1,0,0],[0,0,0,0]],
+        [[0,0,0,0],[1,1,1,0],[0,0,1,0],[0,0,0,0]],
+        [[0,1,1,0],[0,1,0,0],[0,1,0,0],[0,0,0,0]],
+    ],
+    "L": [
+        [[0,0,1,0],[1,1,1,0],[0,0,0,0],[0,0,0,0]],
+        [[1,1,0,0],[0,1,0,0],[0,1,0,0],[0,0,0,0]],
+        [[0,0,0,0],[1,1,1,0],[1,0,0,0],[0,0,0,0]],
+        [[0,1,0,0],[0,1,0,0],[0,1,1,0],[0,0,0,0]],
+    ],
+}
 
 class TetrisGame:
     def __init__(self, root):
@@ -194,23 +91,9 @@ class TetrisGame:
             random.shuffle(PIECES)
             self.next_pieces += PIECES
 
-        self.rot=0
+        self.rot = 0
         self.current_piece_shape = self.next_pieces.pop(0)
-        match self.current_piece_shape:
-            case "T":
-                self.current_piece = T_mino[self.rot]
-            case "I":
-                self.current_piece = I_mino[self.rot]
-            case "O":
-                self.current_piece = O_mino[self.rot]
-            case "Z":
-                self.current_piece = Z_mino[self.rot]
-            case "S":
-                self.current_piece = S_mino[self.rot]
-            case "J":
-                self.current_piece = J_mino[self.rot]
-            case "L":
-                self.current_piece = L_mino[self.rot]
+        self.current_piece = MINOS[self.current_piece_shape][self.rot]
 
         self.current_piece_position = [0, GRID_WIDTH // 2 - len(self.current_piece[0]) // 2]
 
@@ -262,75 +145,19 @@ class TetrisGame:
     
     def rotate_counterclockwise(self, event):
         """反時計回りに回転"""
-        self.rot = (self.rot - 1) % 4 
-        match self.current_piece_shape:
-            case "T":
-                self.current_piece = T_mino[self.rot]
-            case "I":
-                self.current_piece = I_mino[self.rot]
-            case "O":
-                self.current_piece = O_mino[self.rot]
-            case "Z":
-                self.current_piece = Z_mino[self.rot]
-            case "S":
-                self.current_piece = S_mino[self.rot]
-            case "J":
-                self.current_piece = J_mino[self.rot]
-            case "L":
-                self.current_piece = L_mino[self.rot]
-        if not self.is_valid_position():
-            self.rot = (self.rot + 1) % 4  # 元に戻す
-            match self.current_piece_shape:
-                case "T":
-                    self.current_piece = T_mino[self.rot]
-                case "I":
-                    self.current_piece = I_mino[self.rot]
-                case "O":
-                    self.current_piece = O_mino[self.rot]
-                case "Z":
-                    self.current_piece = Z_mino[self.rot]
-                case "S":
-                    self.current_piece = S_mino[self.rot]
-                case "J":
-                    self.current_piece = J_mino[self.rot]
-                case "L":
-                    self.current_piece = L_mino[self.rot]
+        self._try_rotate((self.rot - 1) % 4)
 
     def rotate_clockwise(self, event):
         """時計回りに回転"""
-        self.rot = (self.rot + 1) % 4 
-        match self.current_piece_shape:
-            case "T":
-                self.current_piece = T_mino[self.rot]
-            case "I":
-                self.current_piece = I_mino[self.rot]
-            case "O":
-                self.current_piece = O_mino[self.rot]
-            case "Z":
-                self.current_piece = Z_mino[self.rot]
-            case "S":
-                self.current_piece = S_mino[self.rot]
-            case "J":
-                self.current_piece = J_mino[self.rot]
-            case "L":
-                self.current_piece = L_mino[self.rot]
-        if not self.is_valid_position():
-            self.rot = (self.rot - 1) % 4  # 元に戻す
-            match self.current_piece_shape:
-                case "T":
-                    self.current_piece = T_mino[self.rot]
-                case "I":
-                    self.current_piece = I_mino[self.rot]
-                case "O":
-                    self.current_piece = O_mino[self.rot]
-                case "Z":
-                    self.current_piece = Z_mino[self.rot]
-                case "S":
-                    self.current_piece = S_mino[self.rot]
-                case "J":
-                    self.current_piece = J_mino[self.rot]
-                case "L":
-                    self.current_piece = L_mino[self.rot]
+        self._try_rotate((self.rot + 1) % 4)
+
+    def _try_rotate(self, new_rot):
+        old_piece, old_rot = self.current_piece, self.rot
+        self.current_piece = MINOS[self.current_piece_shape][new_rot]
+        if self.is_valid_position():
+            self.rot = new_rot
+        else:
+            self.current_piece = old_piece
 
 
 
@@ -411,22 +238,7 @@ class TetrisGame:
         self.next_canvas.delete("all")
         for i in range(min(NUM_NEXT_PIECES, len(self.next_pieces))):
             piece_shape = self.next_pieces[i]
-            piece = None
-            match piece_shape:
-                case "T":
-                    piece = T_mino[0]
-                case "I":
-                    piece = I_mino[0]
-                case "O":
-                    piece = O_mino[0]
-                case "Z":
-                    piece = Z_mino[0]
-                case "S":
-                    piece = S_mino[0]
-                case "J":
-                    piece = J_mino[0]
-                case "L":
-                    piece = L_mino[0]
+            piece = MINOS[piece_shape][0]
             for y, row in enumerate(piece):
                 for x, cell in enumerate(row):
                     if cell:
