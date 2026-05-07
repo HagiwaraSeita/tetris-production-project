@@ -9,6 +9,30 @@ NUM_NEXT_PIECES = 5
 
 PIECES = ['T', 'O', 'I', 'Z', 'S', 'J', 'L']
 
+# SRS wall kick data: (from_rot, to_rot) -> list of (dx, dy) offsets
+# dy is positive-upward (wiki convention); applied as position[0] -= dy in code
+SRS_JLSTZ = {
+    (0, 1): [(0, 0), (-1, 0), (-1,  1), (0, -2), (-1, -2)],
+    (1, 0): [(0, 0), ( 1, 0), ( 1, -1), (0,  2), ( 1,  2)],
+    (1, 2): [(0, 0), ( 1, 0), ( 1, -1), (0,  2), ( 1,  2)],
+    (2, 1): [(0, 0), (-1, 0), (-1,  1), (0, -2), (-1, -2)],
+    (2, 3): [(0, 0), ( 1, 0), ( 1,  1), (0, -2), ( 1, -2)],
+    (3, 2): [(0, 0), (-1, 0), (-1, -1), (0,  2), (-1,  2)],
+    (3, 0): [(0, 0), (-1, 0), (-1, -1), (0,  2), (-1,  2)],
+    (0, 3): [(0, 0), ( 1, 0), ( 1,  1), (0, -2), ( 1, -2)],
+}
+
+SRS_I = {
+    (0, 1): [(0, 0), (-2, 0), ( 1, 0), (-2, -1), ( 1,  2)],
+    (1, 0): [(0, 0), ( 2, 0), (-1, 0), ( 2,  1), (-1, -2)],
+    (1, 2): [(0, 0), (-1, 0), ( 2, 0), (-1,  2), ( 2, -1)],
+    (2, 1): [(0, 0), ( 1, 0), (-2, 0), ( 1, -2), (-2,  1)],
+    (2, 3): [(0, 0), ( 2, 0), (-1, 0), ( 2,  1), (-1, -2)],
+    (3, 2): [(0, 0), (-2, 0), ( 1, 0), (-2, -1), ( 1,  2)],
+    (3, 0): [(0, 0), ( 1, 0), (-2, 0), ( 1, -2), (-2,  1)],
+    (0, 3): [(0, 0), (-1, 0), ( 2, 0), (-1,  2), ( 2, -1)],
+}
+
 MINOS = {
     "T": [
         [[0,1,0,0],[1,1,1,0],[0,0,0,0],[0,0,0,0]],
@@ -152,12 +176,28 @@ class TetrisGame:
         self._try_rotate((self.rot + 1) % 4)
 
     def _try_rotate(self, new_rot):
-        old_piece, old_rot = self.current_piece, self.rot
-        self.current_piece = MINOS[self.current_piece_shape][new_rot]
-        if self.is_valid_position():
+        if self.current_piece_shape == 'O':
             self.rot = new_rot
+            return
+
+        if self.current_piece_shape == 'I':
+            kicks = SRS_I.get((self.rot, new_rot), [(0, 0)])
         else:
-            self.current_piece = old_piece
+            kicks = SRS_JLSTZ.get((self.rot, new_rot), [(0, 0)])
+
+        old_piece = self.current_piece
+        old_pos = self.current_piece_position[:]
+        self.current_piece = MINOS[self.current_piece_shape][new_rot]
+
+        for dx, dy in kicks:
+            self.current_piece_position[0] = old_pos[0] - dy  # dy is positive-up; screen y is positive-down
+            self.current_piece_position[1] = old_pos[1] + dx
+            if self.is_valid_position():
+                self.rot = new_rot
+                return
+
+        self.current_piece = old_piece
+        self.current_piece_position = old_pos
 
 
 
@@ -168,9 +208,9 @@ class TetrisGame:
                 if cell:
                     new_x = self.current_piece_position[1] + x
                     new_y = self.current_piece_position[0] + y
-                    if (new_x < 0 or new_x >= GRID_WIDTH or
-                            new_y >= GRID_HEIGHT or
-                            self.board[new_y][new_x]):
+                    if new_x < 0 or new_x >= GRID_WIDTH or new_y >= GRID_HEIGHT:
+                        return False
+                    if new_y >= 0 and self.board[new_y][new_x]:
                         return False
         return True
 
