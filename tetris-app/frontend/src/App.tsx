@@ -1,5 +1,6 @@
 import { useGame } from './hooks/useGame'
 import { Board } from './components/Board'
+import { Chat } from './components/Chat'
 import { HoldPiece } from './components/HoldPiece'
 import { NextPieces } from './components/NextPieces'
 
@@ -82,6 +83,11 @@ export default function App() {
       {/* Right panel */}
       <div style={{ paddingTop: 4 }}>
         <NextPieces nextPieces={gameState.next_pieces} />
+      </div>
+
+      {/* Chat panel */}
+      <div style={{ paddingTop: 4 }}>
+        <Chat />
       </div>
     </div>
   )

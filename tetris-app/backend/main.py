@@ -1,11 +1,17 @@
 import asyncio
 import json
+import os
 from typing import Optional
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from dotenv import load_dotenv
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from openai import AsyncOpenAI
 
 from controller.game_controller import GameController
+
+load_dotenv()
+openai_client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI()
 app.add_middleware(
@@ -37,6 +43,21 @@ _LOCK_RESET_ACTIONS = {
     "rotate_counterclockwise",
     "rotate_180",
 }
+
+
+@app.post("/chat")
+async def chat(request: Request):
+    body = await request.json()
+    message = body.get("message", "こんにちは")
+
+    try:
+        response = await openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": message}],
+        )
+        return {"reply": response.choices[0].message.content}
+    except Exception as e:
+        return {"reply": f"エラー: {e}"}
 
 
 @app.websocket("/ws")

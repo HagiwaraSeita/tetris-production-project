@@ -51,8 +51,18 @@ export function useGame(wsUrl: string) {
   // DAS: 毎フレーム held を走査し、DAS_FRAMES 経過後は毎フレーム送信
   useEffect(() => {
     const tick = () => {
+      const leftF = held.current.get('move_left')
+      const rightF = held.current.get('move_right')
+
+      // 両方押されているとき: フレーム数が少ない（より最近押した）ほうだけ動かす
+      const skipLeft  = leftF !== undefined && rightF !== undefined && rightF < leftF
+      const skipRight = leftF !== undefined && rightF !== undefined && leftF <= rightF
+
       held.current.forEach((frames, action) => {
-        if (frames >= DAS_FRAMES) sendAction(action)
+        const skipped =
+          (action === 'move_left'  && skipLeft) ||
+          (action === 'move_right' && skipRight)
+        if (!skipped && frames >= DAS_FRAMES) sendAction(action)
         held.current.set(action, frames + 1)
       })
       rafRef.current = requestAnimationFrame(tick)
