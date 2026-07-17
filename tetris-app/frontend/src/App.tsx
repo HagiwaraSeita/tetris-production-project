@@ -65,6 +65,7 @@ export default function App() {
           <div>L ↺ CCW rotate</div>
           <div>I ↕ 180 rotate</div>
           <div>K ⊟ Hold</div>
+          <div>R 🔄 Restart</div>
         </div>
       </div>
 

@@ -193,7 +193,11 @@ async def websocket_endpoint(websocket: WebSocket):
             msg = json.loads(data)
             action = msg.get("action")
 
-            if not controller.state.game_over and action in _ACTIONS:
+            if action == "restart":
+                controller.restart()
+                cancel_lock()
+
+            elif not controller.state.game_over and action in _ACTIONS:
                 was_grounded = controller.is_grounded()
 
                 if action in ("hard_drop", "hold"):

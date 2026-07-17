@@ -5,9 +5,7 @@ from model.game_state import GameState
 
 class GameController:
     def __init__(self):
-        self.state = GameState()
-        self._refill_next()
-        self._pop_next_piece()
+        self.restart()
 
     # --- internal helpers ---
 
@@ -171,6 +169,12 @@ class GameController:
 
     def gravity_tick(self) -> bool:
         return self.move_down()
+    
+    def restart(self) -> bool:
+        self.state = GameState()
+        self._refill_next()
+        self._pop_next_piece()
+        return True
 
     def get_state(self) -> dict:
         return self.state.to_dict()

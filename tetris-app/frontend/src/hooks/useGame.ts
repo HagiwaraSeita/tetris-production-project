@@ -22,6 +22,7 @@ const KEY_MAP: Record<string, string> = {
   l: 'rotate_counterclockwise',
   j: 'rotate_clockwise',
   i: 'rotate_180',
+  r: 'restart',
 }
 
 // 長押しリピートを有効にするアクション
