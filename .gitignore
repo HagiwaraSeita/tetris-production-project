@@ -1,2 +1,4 @@
 # Environment
 tetris-app/backend/.env
+__pycache__/
+*.pyc
