@@ -1,17 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
- 
-export interface GameState {
-  board: (string | 0)[][]
-  current_piece_shape: string
-  current_piece: number[][]
-  current_piece_position: [number, number]
-  ghost_position: [number, number]
-  rot: number
-  next_pieces: string[]
-  hold_piece_shape: string | null
-  score: number
-  game_over: boolean
-}
+import { GameState } from '../game/gameState'
+import {
+  moveLeft,
+  moveRight,
+  moveDown,
+  hardDrop,
+  hold,
+  rotateClockwise,
+  rotateCounterClockwise,
+  rotate180,
+  restart,
+} from '../game/gameController'
 
 const KEY_MAP: Record<string, string> = {
   a: 'move_left',
@@ -25,31 +24,45 @@ const KEY_MAP: Record<string, string> = {
   r: 'restart',
 }
 
+// action文字列 -> gameController.tsの関数、への対応表
+const ACTION_MAP: Record<string, (state: GameState) => GameState | null> = {
+  move_left: moveLeft,
+  move_right: moveRight,
+  move_down: moveDown,
+  hard_drop: hardDrop,
+  hold: hold,
+  rotate_clockwise: rotateClockwise,
+  rotate_counterclockwise: rotateCounterClockwise,
+  rotate_180: rotate180,
+}
+
 // 長押しリピートを有効にするアクション
 const DAS_ACTIONS = new Set(['move_left', 'move_right', 'move_down'])
 const DAS_FRAMES = 6  // 長押し開始までのフレーム数
 
-export function useGame(wsUrl: string) {
-  const [gameState, setGameState] = useState<GameState | null>(null)
-  const ws = useRef<WebSocket | null>(null)
+export function useGame() {
+  console.log("restart結果:", restart())
+  const [gameState, setGameState] = useState<GameState>(() => restart())
   // action -> 押し始めてからのフレーム数
   const held = useRef<Map<string, number>>(new Map())
   const rafRef = useRef<number>(0)
 
-  useEffect(() => {
-    const socket = new WebSocket(wsUrl)
-    ws.current = socket
-    socket.onmessage = (e) => setGameState(JSON.parse(e.data) as GameState)
-    return () => socket.close()
-  }, [wsUrl])
-
   const sendAction = useCallback((action: string) => {
-    if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({ action }))
+    if (action === 'restart') {
+      setGameState(restart())
+      return
     }
+
+    const fn = ACTION_MAP[action]
+    if (!fn) return
+
+    setGameState((prev) => {
+      const next = fn(prev)
+      return next ?? prev  // 失敗(null)なら元の状態を維持
+    })
   }, [])
 
-  // DAS: 毎フレーム held を走査し、DAS_FRAMES 経過後は毎フレーム送信
+  // DAS: 毎フレーム held を走査し、DAS_FRAMES 経過後は毎フレーム実行
   useEffect(() => {
     const tick = () => {
       const leftF = held.current.get('move_left')
@@ -78,7 +91,7 @@ export function useGame(wsUrl: string) {
       const action = KEY_MAP[e.key]
       if (!action) return
       e.preventDefault()
-      sendAction(action)  // 最初の押下は即時送信
+      sendAction(action)  // 最初の押下は即時実行
       if (DAS_ACTIONS.has(action)) {
         held.current.set(action, 0)  // DAS カウント開始
       }

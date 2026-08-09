@@ -79,11 +79,13 @@ function tryRotate(state: GameState, newRot: number): GameState | null {
   for (const [dx, dy] of kickList) {
     const testPos: Position = [oldPos[0] - dy, oldPos[1] + dx]
     if (isValidPosition(newPiece, testPos, board)) {
+      const newGhost = updateGhost(newPiece, testPos, board)
       return {
         ...state,
         current_piece: newPiece,
         current_piece_position: testPos,
         rot: newRot,
+        ghost_position: newGhost,
       }
     }
   }
@@ -102,11 +104,11 @@ export function refillNext(nextPieces: string[]): string[] {
 // ネクストの先頭を取り出して、次のミノをセットする
 export function popNextPiece(state: GameState): GameState {
   let gameOver = false
-  const nextPieces = refillNext(state.next_pieces)
+  const refilled = refillNext(state.next_pieces)
   const newRot: number = 0
-  const newPieceShape = nextPieces.shift()
+  const [newPieceShape, ...nextPieces] = refilled
 
-  // .shift()の返り値が string | undefined のため
+  // 分割代入の結果が string | undefined のため
   if (newPieceShape === undefined) {
     throw new Error("next_pieces が空です。refillNext が正しく動いていない可能性があります")
   }

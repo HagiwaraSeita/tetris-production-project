@@ -6,7 +6,7 @@ import { HoldPiece } from './components/HoldPiece'
 import { NextPieces } from './components/NextPieces'
 
 export default function App() {
-  const { gameState } = useGame('ws://localhost:8000/ws')
+  const { gameState } = useGame()
   const [aiHighlightCells, setAiHighlightCells] = useState<[number, number][] | null>(null)
   // ミノが設置されたら（盤面の埋まりセル数が変化したら）ハイライトを消す
   const prevFilledRef = useRef(0)
@@ -18,22 +18,6 @@ export default function App() {
       setAiHighlightCells(null)
     }
   }, [gameState])
-
-  if (!gameState) {
-    return (
-      <div
-        style={{
-          color: '#aaa',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        Connecting...
-      </div>
-    )
-  }
 
   return (
     <div

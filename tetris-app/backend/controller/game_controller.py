@@ -25,6 +25,7 @@ class GameController:
         if not self._is_valid_position():
             self.state.game_over = True
 
+
     def _is_valid_position(self, piece=None, pos=None):
         if piece is None:
             piece = self.state.current_piece
