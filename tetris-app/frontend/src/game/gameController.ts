@@ -143,7 +143,11 @@ export function isGrounded(state: GameState): boolean {
 export function forceLock(state: GameState): GameState {
   let newState = lockPiece(state)
   const { board, clearedCount } = clearLines(newState)
-  newState = { ...newState, board: board }
+  newState = {
+    ...newState,
+    board: board,
+    score: newState.score + clearedCount * 100,
+  }
   newState = popNextPiece(newState)
   return newState
 }
@@ -201,7 +205,12 @@ export function hardDrop(state: GameState): GameState {
   const dropPos = state.ghost_position
   let newState = lockPiece({ ...state, current_piece_position: dropPos })
   const { board, clearedCount } = clearLines(newState)
-  newState = { ...newState, board: board }
+
+  newState = {
+    ...newState,
+    board: board,
+    score: newState.score + clearedCount * 100,
+  }
   newState = popNextPiece(newState)
   return newState
 }
