@@ -83,9 +83,11 @@ export default function App() {
       </div>
 
       {/* Chat panel */}
+      {/* Chat panel（AIサーバーが必要なため、GitHub Pages公開時は一時的に無効化）
       <div style={{ paddingTop: 4 }}>
         <Chat gameState={gameState} onAIPlacement={setAiHighlightCells} />
       </div>
+      */}
     </div>
   )
 }

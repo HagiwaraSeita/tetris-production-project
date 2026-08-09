@@ -1,5 +1,5 @@
 import React from 'react'
-import { GameState } from '../hooks/useGame'
+import { GameState } from '../game/gameState'
 import { PIECE_COLORS } from '../constants'
 
 const CELL_SIZE = 30

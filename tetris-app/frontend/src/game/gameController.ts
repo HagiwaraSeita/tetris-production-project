@@ -1,6 +1,6 @@
 import { PIECES, INITIAL_PIECE_POSITION, PieceShape, GRID_WIDTH, GRID_HEIGHT, SRS_JLSTZ, SRS_I, MINOS, NUM_NEXT_PIECES, SRS_180 } from "./pieces"
 import { Board, Position, initialGameState } from "./gameState"
-import { GameState } from "./../hooks/useGame"
+import { GameState } from "./gameState"
 import { shuffle } from "lodash"
 
 type ClearLinesResult = { board: Board, clearedCount: number }

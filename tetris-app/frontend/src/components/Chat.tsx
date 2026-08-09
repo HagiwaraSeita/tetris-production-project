@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { GameState } from '../hooks/useGame'
+import { GameState } from '../game/gameState'
 
 interface Message {
   role: 'user' | 'ai'
