@@ -1,6 +1,9 @@
+import { Position } from "./gameState"
+
 export const GRID_WIDTH = 10
 export const GRID_HEIGHT = 20
 export const NUM_NEXT_PIECES = 5
+export const INITIAL_PIECE_POSITION: Position = [0, GRID_WIDTH / 2 - 2]
 
 export const PIECES: string[] = ['T', 'O', 'I', 'Z', 'S', 'J', 'L']
 
@@ -31,8 +34,8 @@ export const SRS_180: [number, number][] = [
   [0, -1], [1, -1], [-1, -1], [0, 1],
 ]
 
-type PieceShape = number[][]
-type PieceShapes = [PieceShape, PieceShape, PieceShape, PieceShape]
+export type PieceShape = number[][]
+export type PieceShapes = [PieceShape, PieceShape, PieceShape, PieceShape]
 
 export const MINOS: Record<string, PieceShapes> = {
   "T": [
