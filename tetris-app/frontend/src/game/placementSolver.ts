@@ -26,6 +26,23 @@ const MOVES = [
   // rotate180,  // 180度回転はゲームによって存在しないので、追加は要検討
 ]
 
+// ミノが占めている絶対座標を、重複判定用の1つの文字列にする
+function shapeKey(state: GameState): string {
+  const piece = state.current_piece
+  const [py, px] = state.current_piece_position
+  const cells: string[] = []
+
+  for (let y = 0; y < piece.length; y++) {
+    for (let x = 0; x < piece[y].length; x++) {
+      if (piece[y][x]) {
+        cells.push(`${py + y},${px + x}`)
+      }
+    }
+  }
+
+  return cells.sort().join("|")
+}
+
 export function getAllValidPlacements(state: GameState): GameState[] {
   const pieceType = state.current_piece_shape
   const board = state.board
@@ -92,5 +109,14 @@ export function getAllValidPlacements(state: GameState): GameState[] {
     }
   }
 
-  return placements
+  // --- 重複排除 ---
+  const seen = new Set<string>()
+  const uniquePlacements = placements.filter(p => {
+    const key = shapeKey(p)
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+
+  return uniquePlacements
 }
