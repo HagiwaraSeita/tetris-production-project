@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { GameState } from '../game/gameState'
+import { getAllValidPlacements } from '../game/placementSolver'
 import {
   moveLeft,
   moveRight,
@@ -41,8 +42,8 @@ const DAS_ACTIONS = new Set(['move_left', 'move_right', 'move_down'])
 const DAS_FRAMES = 6  // 長押し開始までのフレーム数
 
 export function useGame() {
-  console.log("restart結果:", restart())
   const [gameState, setGameState] = useState<GameState>(() => restart())
+  const [placements, setPlacements] = useState<GameState[] | null>(null)
   // action -> 押し始めてからのフレーム数
   const held = useRef<Map<string, number>>(new Map())
   const rafRef = useRef<number>(0)
@@ -50,6 +51,7 @@ export function useGame() {
   const sendAction = useCallback((action: string) => {
     if (action === 'restart') {
       setGameState(restart())
+      setPlacements(null)  // リスタートしたら探索結果はリセットする
       return
     }
 
@@ -88,6 +90,13 @@ export function useGame() {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return  // ブラウザ側のキーリピートは使わない
+
+      if (e.key === 'g') {
+        e.preventDefault()
+        setPlacements((prev) => (prev ? null : getAllValidPlacements(gameState)))
+        return
+      }
+
       const action = KEY_MAP[e.key]
       if (!action) return
       e.preventDefault()
@@ -106,7 +115,7 @@ export function useGame() {
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
     }
-  }, [sendAction])
+  }, [sendAction, gameState])
 
-  return { gameState, sendAction }
+  return { gameState, sendAction, placements }
 }

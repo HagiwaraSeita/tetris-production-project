@@ -1,12 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
 import { useGame } from './hooks/useGame'
 import { Board } from './components/Board'
-import { Chat } from './components/Chat'
 import { HoldPiece } from './components/HoldPiece'
 import { NextPieces } from './components/NextPieces'
+import { lockPiece } from './game/gameController'
+import { PIECE_COLORS } from './constants'
+
+const PREVIEW_CELL_SIZE = 8
 
 export default function App() {
-  const { gameState } = useGame()
+  const { gameState, placements } = useGame()
   const [aiHighlightCells, setAiHighlightCells] = useState<[number, number][] | null>(null)
   // ミノが設置されたら（盤面の埋まりセル数が変化したら）ハイライトを消す
   const prevFilledRef = useRef(0)
@@ -50,6 +53,7 @@ export default function App() {
           <div>I ↕ 180 rotate</div>
           <div>K ⊟ Hold</div>
           <div>R 🔄 Restart</div>
+          <div>G 🔍 Show placements</div>
         </div>
       </div>
 
@@ -82,9 +86,58 @@ export default function App() {
         <NextPieces nextPieces={gameState.next_pieces} />
       </div>
 
-      {/* Chat panel */}
-      <div style={{ paddingTop: 4 }}>
-        <Chat gameState={gameState} onAIPlacement={setAiHighlightCells} />
+      {/* Placements panel（Gキーで探索結果を表示） */}
+      <div style={{ paddingTop: 4, width: 260 }}>
+        <div style={{ color: '#aaa', fontSize: 11, letterSpacing: 2, marginBottom: 8 }}>
+          PLACEMENTS
+        </div>
+        {placements === null ? (
+          <div style={{ color: '#333', fontSize: 11 }}>
+            「G」を押すと、現在のミノの置ける場所を全部表示します
+          </div>
+        ) : (
+          <>
+            <div style={{ color: 'white', fontSize: 12, marginBottom: 8 }}>
+              {placements.length} 通り見つかりました
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 6,
+                maxHeight: 600,
+                overflowY: 'auto',
+              }}
+            >
+              {placements.map((placement, i) => {
+                const locked = lockPiece(placement)
+                return (
+                  <div key={i} style={{ border: '1px solid #333' }}>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: `repeat(10, ${PREVIEW_CELL_SIZE}px)`,
+                      }}
+                    >
+                      {locked.board.map((row, y) =>
+                        row.map((cell, x) => (
+                          <div
+                            key={`${y}-${x}`}
+                            style={{
+                              width: PREVIEW_CELL_SIZE,
+                              height: PREVIEW_CELL_SIZE,
+                              backgroundColor: cell ? (PIECE_COLORS[cell as string] ?? '#888') : '#111',
+                            }}
+                          />
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
