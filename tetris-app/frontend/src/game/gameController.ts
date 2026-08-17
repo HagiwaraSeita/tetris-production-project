@@ -186,6 +186,30 @@ export function moveRight(state: GameState): GameState | null {
   }
 }
 
+export function moveLeftEdge(state: GameState): GameState {
+  let current = state
+
+  while (true) {
+    const next = moveLeft(current)
+    if (next === null)
+      break
+    current = next
+  }
+  return current
+}
+
+export function moveRightEdge(state: GameState): GameState {
+  let current = state
+
+  while (true) {
+    const next = moveRight(current)
+    if (next === null)
+      break
+    current = next
+  }
+  return current
+}
+
 export function moveDown(state: GameState): GameState | null {
   const board = state.board
   const piece = state.current_piece
